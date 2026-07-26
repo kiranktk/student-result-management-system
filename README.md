@@ -1,0 +1,1 @@
+This repository contains the assignments I completed during my internship at Tech4Edges. The goal of these tasks is to improve my programming skills in Dart and prepare for Flutter application development through practical exercises.
