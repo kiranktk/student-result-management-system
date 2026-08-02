@@ -1,204 +1,103 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
+
+// ------------------------------
+// Student Result Management System
+// Dart Console Application
+// ------------------------------
+
+const int maxMarksPerSubject = 100;
+const int totalSubjects = 3;
+
+// Function to calculate total marks
+double calculateTotal(List<double> marks) {
+  double total = 0;
+
+  for (double mark in marks) {
+    total += mark;
+  }
+
+  return total;
+}
+
+// Function to calculate percentage
+double calculatePercentage(double totalMarks) {
+  return (totalMarks / (totalSubjects * maxMarksPerSubject)) * 100;
+}
+
+// Function to calculate grade
+String calculateGrade(double percentage) {
+  if (percentage >= 80) {
+    return "A";
+  } else if (percentage >= 70) {
+    return "B";
+  } else if (percentage >= 60) {
+    return "C";
+  } else if (percentage >= 50) {
+    return "D";
+  } else {
+    return "Fail";
+  }
+}
 
 void main() {
-  runApp(const StudentResultApp());
-}
+  print("==========================================");
+  print("   STUDENT RESULT MANAGEMENT SYSTEM");
+  print("==========================================\n");
 
-// Main Application
-class StudentResultApp extends StatelessWidget {
-  const StudentResultApp({super.key});
+  // Student Name
+  stdout.write("Enter Student Name: ");
+  String studentName = stdin.readLineSync() ?? "";
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Student Result System',
-      home: StudentResultScreen(),
-    );
-  }
-}
+  List<double> marks = [];
 
-// Main Screen
-class StudentResultScreen extends StatefulWidget {
-  @override
-  State<StudentResultScreen> createState() => _StudentResultScreenState();
-}
+  // Input marks using loop
+  for (int i = 1; i <= totalSubjects; i++) {
+    while (true) {
+      try {
+        stdout.write("Enter Subject $i Marks (0-100): ");
 
-class _StudentResultScreenState extends State<StudentResultScreen> {
+        String? input = stdin.readLineSync();
 
-  // Controller for Student Name
-  final TextEditingController nameController = TextEditingController();
+        if (input == null || input.isEmpty) {
+          throw Exception("Input cannot be empty.");
+        }
 
-  // Controllers for Subject Marks
-  final TextEditingController subject1Controller = TextEditingController();
-  final TextEditingController subject2Controller = TextEditingController();
-  final TextEditingController subject3Controller = TextEditingController();
+        double mark = double.parse(input);
 
-  // Variables to store result
-  double total = 0;
-  double percentage = 0;
-  String grade = "";
-  String status = "";
+        if (mark < 0 || mark > 100) {
+          throw Exception("Marks must be between 0 and 100.");
+        }
 
-  // Function to calculate total marks
-  double calculateTotal(List<double> marks) {
-    double sum = 0;
-
-    // Loop to add all marks
-    for (double mark in marks) {
-      sum += mark;
-    }
-
-    return sum;
-  }
-
-  // Function to calculate percentage
-  double calculatePercentage(double totalMarks) {
-    return (totalMarks / 300) * 100;
-  }
-
-  // Function to calculate grade
-  String calculateGrade(double per) {
-    if (per >= 80) {
-      return "A";
-    } else if (per >= 70) {
-      return "B";
-    } else if (per >= 60) {
-      return "C";
-    } else {
-      return "Fail";
+        marks.add(mark);
+        break;
+      } catch (e) {
+        print("Invalid Input! ${e.toString()}");
+        print("Please enter again.\n");
+      }
     }
   }
 
-  // Function called when button is pressed
-  void calculateResult() {
+  // Calculations
+  double total = calculateTotal(marks);
+  double percentage = calculatePercentage(total);
+  String grade = calculateGrade(percentage);
+  String status = grade == "Fail" ? "Failed" : "Passed";
 
-    // Store marks in List
-    List<double> marks = [
-      double.tryParse(subject1Controller.text) ?? 0,
-      double.tryParse(subject2Controller.text) ?? 0,
-      double.tryParse(subject3Controller.text) ?? 0,
-    ];
+  // Display Result
+  print("\n==========================================");
+  print("              RESULT CARD");
+  print("==========================================");
 
-    // Call Functions
-    total = calculateTotal(marks);
-    percentage = calculatePercentage(total);
-    grade = calculateGrade(percentage);
+  print("Student Name : $studentName");
 
-    // Check Pass or Fail
-    status = grade == "Fail" ? "Failed" : "Passed";
-
-    // Refresh UI
-    setState(() {});
+  for (int i = 0; i < marks.length; i++) {
+    print("Subject ${i + 1} Marks : ${marks[i]}");
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-
-      appBar: AppBar(
-        title: const Text("Student Result Management System"),
-        centerTitle: true,
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-
-        child: Column(
-          children: [
-
-            // Student Name
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: "Student Name",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // Subject 1
-            TextField(
-              controller: subject1Controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Subject 1 Marks",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // Subject 2
-            TextField(
-              controller: subject2Controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Subject 2 Marks",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // Subject 3
-            TextField(
-              controller: subject3Controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Subject 3 Marks",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Calculate Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: calculateResult,
-                child: const Text("Calculate Result"),
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // Result Card
-            Card(
-              elevation: 5,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-
-                    Text(
-                      "Student Name: ${nameController.text}",
-                      style: const TextStyle(fontSize: 18),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Text("Total Marks: $total / 300"),
-
-                    Text(
-                        "Percentage: ${percentage.toStringAsFixed(2)}%"),
-
-                    Text("Grade: $grade"),
-
-                    Text("Status: $status"),
-
-                  ],
-                ),
-              ),
-            ),
-
-          ],
-        ),
-      ),
-    );
-  }
+  print("------------------------------------------");
+  print("Total Marks : $total / 300");
+  print("Percentage  : ${percentage.toStringAsFixed(2)}%");
+  print("Grade       : $grade");
+  print("Status      : $status");
+  print("==========================================");
 }
